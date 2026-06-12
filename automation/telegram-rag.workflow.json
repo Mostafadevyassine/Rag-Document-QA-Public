@@ -1,0 +1,68 @@
+{
+  "name": "Telegram RAG Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "tg-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [260, 300],
+      "webhookId": "telegram-rag",
+      "credentials": {
+        "telegramApi": { "name": "Telegram Bot" }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL }}/ask/bot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "X-Bot-Secret", "value": "={{ $env.BOT_SHARED_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ question: $json.message.text }) }}",
+        "options": {}
+      },
+      "id": "ask-backend",
+      "name": "Ask RAG Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.answer || 'Sorry, something went wrong.' }}",
+        "additionalFields": { "appendAttribution": false }
+      },
+      "id": "tg-reply",
+      "name": "Reply on Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [780, 300],
+      "credentials": {
+        "telegramApi": { "name": "Telegram Bot" }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Ask RAG Backend", "type": "main", "index": 0 }]]
+    },
+    "Ask RAG Backend": {
+      "main": [[{ "node": "Reply on Telegram", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}

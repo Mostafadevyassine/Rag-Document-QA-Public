@@ -1,0 +1,42 @@
+# Local n8n for the Telegram RAG bot.
+#
+#   docker compose -f automation/docker-compose.yml up -d
+#   open http://localhost:5678
+#
+# Telegram pushes messages to a webhook, so n8n needs a public HTTPS URL. We get
+# one from cloudflared (`cloudflared tunnel --url http://localhost:5678`, no
+# signup) and pass it in as WEBHOOK_URL below. n8n then registers that URL with
+# Telegram when you activate the workflow. (n8n's old built-in `--tunnel` flag
+# was removed in v2.) DEV/DEMO only — for something durable use ngrok with a
+# reserved domain or a real host.
+#
+# n8n runs in a container; your .NET backend runs on the host at :5000.
+# From inside the container the host is `host.docker.internal` (works on
+# Docker Desktop for Mac/Windows; on Linux the extra_hosts line below maps it).
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: rag-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=UTC
+      # Allow expressions to read $env (BACKEND_URL / BOT_SHARED_SECRET below).
+      # n8n v2 blocks this by default; the workflow's HTTP node needs it.
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      # Public HTTPS URL for inbound webhooks (from cloudflared/ngrok). Without
+      # it, Telegram can't reach n8n. Set in automation/.env after you start the
+      # tunnel, then restart this container.
+      - WEBHOOK_URL=${WEBHOOK_URL:-}
+      # The bot endpoint's shared secret. Override in automation/.env (gitignored).
+      - BOT_SHARED_SECRET=${BOT_SHARED_SECRET:-change-me}
+      # Where the backend lives, as seen from inside the container.
+      - BACKEND_URL=${BACKEND_URL:-http://host.docker.internal:5000}
+    extra_hosts:
+      # So `host.docker.internal` resolves on Linux too (no-op on Mac/Windows).
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:

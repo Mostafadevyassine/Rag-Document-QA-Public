@@ -1,0 +1,138 @@
+.dropzone {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s,
+    transform 0.05s;
+  outline: none;
+}
+
+.dropzone:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--panel) 92%, var(--accent));
+}
+
+.dropzone:focus-visible {
+  box-shadow: 0 0 0 4px var(--ring);
+  border-color: var(--accent);
+}
+
+.dropzone.is-dragging {
+  border-color: var(--accent);
+  border-style: solid;
+  background: var(--accent-soft);
+  transform: scale(1.005);
+}
+
+.dropzone.is-busy {
+  cursor: progress;
+}
+
+/* Icon disc */
+.dz-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  transition: color 0.15s, background 0.15s;
+}
+
+.state-done .dz-icon {
+  color: #16a34a;
+  background: rgba(34, 197, 94, 0.14);
+}
+
+.state-error .dz-icon {
+  color: #e1483a;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.dz-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.dz-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dz-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dz-sub {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.dz-sub.status-done {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.dz-sub.status-error {
+  color: #e1483a;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dz-sub.status-done,
+  .state-done .dz-icon {
+    color: #4ade80;
+  }
+  .dz-sub.status-error,
+  .state-error .dz-icon {
+    color: #f87171;
+  }
+}
+
+.dz-replace {
+  flex: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+}
+
+.dropzone:hover .dz-replace {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2.5px solid var(--accent-soft);
+  border-top-color: var(--accent);
+  animation: dz-spin 0.7s linear infinite;
+}
+
+@keyframes dz-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
