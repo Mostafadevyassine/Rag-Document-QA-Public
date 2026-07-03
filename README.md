@@ -26,3 +26,13 @@ RAG works in two phases:
 The following diagram illustrates the complete DocQA workflow used in this project :
 
 ![ DocQA Workflow](./assets/image3.png)
+
+
+---
+
+
+## DocQA Features 
+
+
+![ DocQA Features](./assets/image4.png)
+
